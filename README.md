@@ -1,1 +1,1 @@
-# ng_words_extension
+# ng_words_check
