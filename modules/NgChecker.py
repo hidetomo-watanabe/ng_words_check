@@ -1,13 +1,13 @@
 import json
 import requests
-import MeCab
+# import MeCab
 import mojimoji
 import jaconv
 
 
 class NgChecker(object):
     def __init__(self, ng_words_filename):
-        self.mecab_obj = MeCab.Tagger()
+        # self.mecab_obj = MeCab.Tagger()
         self.ng_words_filename = ng_words_filename
 
     def _get_ng_words(self):
@@ -22,6 +22,7 @@ class NgChecker(object):
             text.strip())
         return json.loads(response.text)
 
+    """
     def _get_morpheme_parse(self, text):
         org = self.mecab_obj.parse(text)
         result = []
@@ -36,6 +37,7 @@ class NgChecker(object):
             else:
                 result.append(base_word)
         return result
+    """
 
     def _trans_to_han_kata(self, text):
         hira = jaconv.hira2kata(text)
