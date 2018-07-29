@@ -1,3 +1,5 @@
 # ng_words_check
-### memo
-- とりあえず名詞のみかつ隠し文字なし
+### command
+- docker build -t ng_words_check .
+- docker run -d --name ng_words_check ng_words_check
+- docker cp ng_words_check:/var/task/deploy_package.zip .
