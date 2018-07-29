@@ -12,7 +12,7 @@ class NgChecker(object):
 
     def _get_ng_words(self):
         f = open(self.ng_words_filename, 'r')
-        ng_words = f.read().split('\n')
+        ng_words = f.read().strip().split('\n')
         f.close()
         return ng_words
 
@@ -24,23 +24,17 @@ class NgChecker(object):
 
     def _get_morpheme_parse(self, text):
         org = self.mecab_obj.parse(text)
-        result = {
-            'noun': [],
-            'verb': [],
-            'other': [],
-        }
+        result = []
         for line in org.split('\n'):
             if line == 'EOS':
                 break
             word, morphemes = line.split('\t')
-            morpheme = morphemes.split(',')[0]
+            # morpheme = morphemes.split(',')[0]
             base_word = morphemes.split(',')[6]
-            if morpheme == '名詞':
-                result['noun'].append(base_word)
-            elif morpheme == '動詞':
-                result['verb'].append(base_word)
+            if base_word == '*':
+                result.append(word)
             else:
-                result['other'].append(base_word)
+                result.append(base_word)
         return result
 
     def _trans_to_han_kata(self, text):
@@ -49,6 +43,15 @@ class NgChecker(object):
         return han_hira
 
     def get_ng_part(self, text):
+        def _is_ng(text):
+            mecab_result = self._get_morpheme_parse(text)
+            for word in mecab_result:
+                word_hankata = self._trans_to_han_kata(word)
+                for ng_word in ng_words_hankata:
+                    if ng_word in word_hankata:
+                        return True
+            return False
+
         check_result = []
         ng_words = self._get_ng_words()
         # 半角カタカナに統一
@@ -59,11 +62,8 @@ class NgChecker(object):
         for unit in ime_result:
             org = unit[0]
             trans = unit[1][0]
-            mecab_result = self._get_morpheme_parse(trans)
-            for morpheme in mecab_result.keys():
-                for word in mecab_result[morpheme]:
-                    if self._trans_to_han_kata(word) in ng_words_hankata:
-                        check_result.append(org)
+            if _is_ng(trans):
+                check_result.append(org)
         return check_result
 
 
