@@ -44,12 +44,20 @@ class NgChecker(object):
 
     def get_ng_part(self, text):
         def _is_ng(text):
+            """
+            # google imeが簡易形態素解析になっているため、
+            # とりあえずなくす
             mecab_result = self._get_morpheme_parse(text)
             for word in mecab_result:
                 word_hankata = self._trans_to_han_kata(word)
                 for ng_word in ng_words_hankata:
                     if ng_word in word_hankata:
                         return True
+            """
+            text_hankata = self._trans_to_han_kata(text)
+            for ng_word in ng_words_hankata:
+                if ng_word in text_hankata:
+                    return True
             return False
 
         check_result = []
