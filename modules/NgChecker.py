@@ -1,3 +1,5 @@
+import json
+import requests
 import MeCab
 import mojimoji
 import jaconv
@@ -13,6 +15,15 @@ class NgChecker(object):
         ng_words = f.read().split('\n')
         f.close()
         return ng_words
+
+    def _trans_with_google_ime(self, text):
+        response = requests.get(
+            'http://www.google.com/transliterate?langpair=ja-Hira|ja&text=%s' %
+            text.strip())
+        transed = ''
+        for unit in json.loads(response.text):
+            transed += unit[1][0]
+        return transed
 
     def _get_parse(self, text):
         org = self.mecab_obj.parse(text)
@@ -40,7 +51,8 @@ class NgChecker(object):
         return han_hira
 
     def get_ng_part(self, text):
-        mecab_result = self._get_parse(text)
+        mecab_result = self._get_parse(
+            self._trans_with_google_ime(text))
         check_result = []
         ng_words = self._get_ng_words()
         # 半角カタカナに統一
